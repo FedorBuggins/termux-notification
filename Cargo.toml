@@ -1,0 +1,17 @@
+[package]
+name = "termux-notification"
+version = "0.1.0"
+edition = "2021"
+authors = ["Fedor Buggins <justerest@gmail.com>"]
+description = "Display a system notification by `termux-notification`."
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/FedorBuggins/termux-notification"
+keywords = ["termux", "notification"]
+categories = ["command-line-interface", "android", "termux"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+[features]
+callbacks = []
