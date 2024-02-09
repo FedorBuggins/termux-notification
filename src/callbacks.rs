@@ -1,6 +1,6 @@
 //! Provides callbacks to notifications by socket connection.
 //!
-//! # Requiments
+//! # Requirements
 //!
 //! - `netcat-openbsd` package installed
 //! - `callbacks` feature enabled
