@@ -14,11 +14,11 @@
 //! }
 //! ```
 //!
-//! # Features
+//! ## Feature flags
 //!
 //! - `callbacks`
 
-#[cfg(feature = "callbacks")]
+#[cfg(any(doc, feature = "callbacks"))]
 pub mod callbacks;
 mod options;
 pub mod remove_handle;
