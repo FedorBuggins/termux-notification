@@ -14,16 +14,15 @@ fn main() -> io::Result<()> {
   termux_notification::callbacks::init_socket();
 
   let (tx, rx) = mpsc::channel();
+  let cb = |action| {
+    let tx = tx.clone();
+    move || tx.send(action).unwrap()
+  };
 
   let mut state = 0;
   let mut old = None;
 
   loop {
-    let cb = |action| {
-      let tx = tx.clone();
-      move || tx.send(action).unwrap()
-    };
-
     let new = TermuxNotification::new()
       .id("example")
       .title("Callbacks Example")

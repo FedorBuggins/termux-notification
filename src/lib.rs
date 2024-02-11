@@ -184,9 +184,7 @@ fn ensure_success(output: &Output) -> io::Result<()> {
 fn stdout_stderr(output: &Output) -> String {
   let stdout = String::from_utf8_lossy(&output.stdout);
   let stderr = String::from_utf8_lossy(&output.stderr);
-  [stdout, stderr]
-    .into_iter()
-    .filter(|s| !s.is_empty())
-    .collect::<Vec<_>>()
-    .join("\n")
+  let out = &mut vec![stdout, stderr];
+  out.retain(|s| !s.is_empty());
+  out.join("\n")
 }
