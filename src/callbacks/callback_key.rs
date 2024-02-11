@@ -2,7 +2,7 @@ use std::{fmt, str::FromStr};
 
 use crate::options;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub(crate) struct CallbackKey {
   id: String,
   trigger: String,

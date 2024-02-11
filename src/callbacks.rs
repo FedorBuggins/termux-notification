@@ -41,9 +41,9 @@
 //! ```
 
 mod callback_key;
-mod map;
 
 use std::{
+  collections::HashMap,
   env,
   io::{self, Read},
   os::unix::net::UnixListener,
@@ -56,10 +56,11 @@ use std::{
 
 use crate::{options, TermuxNotification};
 
-use self::{callback_key::CallbackKey, map::Map};
+use self::callback_key::CallbackKey;
 
-static CB_MAP: Mutex<Map<CallbackKey, Box<dyn Fn() + Send>>> =
-  Mutex::new(Map::new());
+type CallbackMap = HashMap<CallbackKey, Box<dyn Fn() + Send>>;
+
+static CALLBACK_MAP: Mutex<Option<CallbackMap>> = Mutex::new(None);
 
 /// Creates socket and listen it at new thread to handle notification callbacks
 ///
@@ -75,11 +76,12 @@ pub fn init_socket() {
       let msg = recv_message(&socket).unwrap();
       let key = CallbackKey::from_str(&msg);
       let Ok(key) = key else { continue };
-      let mut cb_map = CB_MAP.lock().unwrap();
+      let cb_map = &mut CALLBACK_MAP.lock().unwrap();
+      let cb_map = cb_map.get_or_insert_with(HashMap::new);
       let Some(f) = cb_map.get(&key) else { continue };
       f();
       if key.is_finish_trigger() {
-        cb_map.retain(|(k, _)| k.id() != key.id());
+        cb_map.retain(|k, _| k.id() != key.id());
       }
     });
   });
@@ -174,7 +176,11 @@ impl TermuxNotification {
     let key = CallbackKey::new(id, trigger.to_owned());
     let socket = socket_path().to_string_lossy().to_string();
     let cmd = format!(r#"echo "{key}" | nc -UN {socket}"#);
-    CB_MAP.lock().unwrap().insert(key, Box::new(f));
+    CALLBACK_MAP
+      .lock()
+      .unwrap()
+      .get_or_insert_with(HashMap::new)
+      .insert(key, Box::new(f));
     cmd
   }
 
